@@ -429,12 +429,7 @@ export const getStudentTeachers = async (req, res) => {
 
 export const uploadStudentFile = async (req, res) => {
   try {
-    const {
-      studentName,
-      teachers,
-      course,
-      subject,
-    } = req.body;
+    const { studentName, teachers } = req.body;
 
     if (!studentName) {
       return res.status(400).json({
@@ -454,6 +449,40 @@ export const uploadStudentFile = async (req, res) => {
       });
     }
 
+    const student = await User.findOne({
+      name: studentName,
+      role: "student",
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found",
+      });
+    }
+
+    const studentObj = student.toObject();
+
+    const course = Object.keys(studentObj).find(
+      (key) =>
+        ![
+          "_id",
+          "name",
+          "role",
+          "password",
+          "__v",
+          "createdAt",
+          "updatedAt",
+        ].includes(key) &&
+        typeof studentObj[key] === "object" &&
+        studentObj[key] !== null
+    );
+
+    if (!course) {
+      return res.status(400).json({
+        message: "Course not found",
+      });
+    }
+
     const parsedTeachers =
       typeof teachers === "string"
         ? JSON.parse(teachers)
@@ -462,6 +491,17 @@ export const uploadStudentFile = async (req, res) => {
     const docs = [];
 
     for (const teacherName of parsedTeachers) {
+      const teacher = await Teacher.findOne({
+        name: teacherName,
+        role: "teacher",
+      });
+
+      if (!teacher) {
+        continue;
+      }
+
+      const subject = teacher.Subject;
+
       const doc = await StudentSend.create({
         studentName,
         teacherName,
