@@ -6,9 +6,30 @@ import { Navbar } from "../../components/NavBar";
 export const SFile = () => {
   const user = getUserData();
 
+  const [teachers, setTeachers] = useState([]);
+  const [selectedTeachers, setSelectedTeachers] = useState([]);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
   const [course, setCourse] = useState("");
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await fetch(
+        `https://core-campus-backend.onrender.com/student/teachers/${encodeURIComponent(
+          user.name
+        )}`
+      );
+
+      const data = await res.json();
+
+      setTeachers(data.teachers || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchFiles = async () => {
     try {
@@ -32,13 +53,71 @@ export const SFile = () => {
     }
   };
 
-  useEffect(() => {
-    fetchFiles();
-  }, [user?.name]);
+useEffect(() => {
+  fetchFiles();
+  fetchTeachers();
+}, [user?.name]);
 
-  const getFileUrl = (filePath) => {
-    if (!filePath) return "#";
-    if (filePath.startsWith("http")) return filePath;
+  const toggleTeacher = (teacherName) => {
+    setSelectedTeachers((prev) =>
+      prev.includes(teacherName)
+        ? prev.filter((t) => t !== teacherName)
+        : [...prev, teacherName]
+    );
+  };
+
+  const handleStudentUpload = async (e) => {
+    e.preventDefault();
+
+    if (!uploadFile) {
+      setUploadMessage("Choose a file.");
+      return;
+    }
+
+    if (selectedTeachers.length === 0) {
+      setUploadMessage("Select at least one teacher.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const formData = new FormData();
+
+      formData.append("studentName", user.name);
+      formData.append(
+        "teachers",
+        JSON.stringify(selectedTeachers)
+      );
+      formData.append("file", uploadFile);
+
+      const res = await fetch(
+        "https://core-campus-backend.onrender.com/student/files/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
+      setUploadMessage("File sent successfully.");
+      setSelectedTeachers([]);
+      setUploadFile(null);
+
+    } catch (error) {
+      setUploadMessage(error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+    const getFileUrl = (filePath) => {
+      if (!filePath) return "#";
+      if (filePath.startsWith("http")) return filePath;
     return `http://localhost:5000${filePath}`;
   };
 
@@ -104,6 +183,97 @@ export const SFile = () => {
           ))
         )}
       </div>
-    </div>
+      <div className="bg-[#1E1E1E] rounded-2xl shadow-lg p-5 mt-4">
+        <h2 className="text-xl font-semibold text-[#FF9500] mb-4">
+          Select Teachers
+        </h2>
+
+        {teachers.length === 0 ? (
+          <div className="text-[#8E8E93]">
+            No teachers available.
+          </div>
+        ) : (
+          <div className="grid gap-3">
+            {teachers.map((teacher) => {
+              const selected =
+                selectedTeachers.includes(teacher.name);
+
+              return (
+                <button
+                  key={teacher._id}
+                  type="button"
+                  onClick={() =>
+                    toggleTeacher(teacher.name)
+                  }
+                  className={`flex justify-between items-center rounded-2xl px-4 py-4 border transition ${
+                    selected
+                      ? "border-[#007AFF] bg-[#007AFF]/15"
+                      : "border-[#2A2A2A] bg-[#121212]"
+                  }`}
+                >
+                  <div className="text-left">
+                    <p className="font-semibold">
+                      {teacher.name}
+                    </p>
+
+                    <p className="text-sm text-[#8E8E93]">
+                      {teacher.Subject}
+                    </p>
+                  </div>
+
+                  {selected && (
+                    <span className="text-[#007AFF]">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="bg-[#1E1E1E] rounded-2xl shadow-lg p-5 mt-4">
+        <h2 className="text-xl font-semibold text-[#FF9500] mb-4">
+          Send File To Teacher
+        </h2>
+
+        <form
+          onSubmit={handleStudentUpload}
+          className="space-y-4"
+        >
+          <input
+            type="file"
+            onChange={(e) =>
+              setUploadFile(e.target.files[0])
+            }
+            className="w-full"
+          />
+
+          {uploadMessage && (
+            <div className="rounded-xl bg-[#121212] p-3 text-sm text-[#8E8E93]">
+              {uploadMessage}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={uploading}
+            className="
+              w-full
+              rounded-xl
+              bg-[#007AFF]
+              px-4
+              py-3
+              text-white
+              font-semibold
+            "
+          >
+            {uploading
+              ? "Uploading..."
+              : "Send File"}
+          </button>
+        </form>
+      </div>
+          </div>
   );
 };

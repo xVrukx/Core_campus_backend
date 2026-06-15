@@ -383,25 +383,36 @@ export const getStudentTeachers = async (req, res) => {
           "__v",
           "createdAt",
           "updatedAt",
-        ].includes(key)
+        ].includes(key) &&
+        typeof studentObj[key] === "object" &&
+        studentObj[key] !== null
     );
 
-    const subjects = Object.keys(
-      studentObj[courseKey]
-    );
+    if (!courseKey) {
+      return res.status(400).json({
+        message: "Course not found",
+      });
+    }
+
+    const normalize = (value) =>
+      value
+        .toLowerCase()
+        .replaceAll("_", "")
+        .replaceAll(" ", "");
+
+    const subjects = Object.keys(studentObj[courseKey]);
 
     const teachers = await Teacher.find({
       role: "teacher",
     });
 
-    const matchedTeachers = teachers.filter(
-      (teacher) =>
-        subjects.includes(
-          teacher.Subject
-            .toLowerCase()
-            .replace(/\s+/g, "_")
-        )
-    );
+    const matchedTeachers = teachers.filter((teacher) => {
+      return subjects.some(
+        (subject) =>
+          normalize(subject) ===
+          normalize(teacher.Subject)
+      );
+    });
 
     return res.status(200).json({
       course: courseKey,
