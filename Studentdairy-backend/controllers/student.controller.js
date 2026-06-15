@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import AttendanceOtp from "../models/AttendencdOTPSend.js";
 import AttendanceOtpReceive from "../models/AttendanceOtpReceive.js";
 import TeacherSend from "../models/TeacherSend.js";
+import Teacher from "../models/Teacher.js";
 
 const META_KEYS = new Set([
   "_id",
