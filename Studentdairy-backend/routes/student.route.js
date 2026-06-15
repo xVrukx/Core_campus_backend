@@ -8,6 +8,7 @@ import {
   getStudentTeachers,
   uploadStudentFile
 } from "../controllers/student.controller.js";
+import { upload } from "../controllers/upload.js";
 
 export const student_router = express.Router();
 
