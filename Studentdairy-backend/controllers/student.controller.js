@@ -426,29 +426,26 @@ export const getStudentTeachers = async (req, res) => {
   }
 };
 
-export const uploadStudentFile = async (
-  req,
-  res
-) => {
+export const uploadStudentFile = async (req,res) => {
   try {
     const {
       studentName,
-      teacherNames,
+      teachers,
       course,
       subject,
     } = req.body;
-
+    
     if (!req.file) {
       return res.status(400).json({
         message: "File required",
       });
     }
 
-    const teachers = JSON.parse(teacherNames);
+    const teacher = JSON.parse(teachers);
 
     const docs = [];
 
-    for (const teacherName of teachers) {
+    for (const teacherName of teacher) {
       const doc = await StudentSend.create({
         studentName,
         teacherName,

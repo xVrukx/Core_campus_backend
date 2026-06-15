@@ -92,7 +92,7 @@ useEffect(() => {
       formData.append("file", uploadFile);
 
       const res = await fetch(
-        "https://core-campus-backend.onrender.com/student/files/upload",
+        "https://core-campus-backend.onrender.com/student/upload-file",
         {
           method: "POST",
           body: formData,
