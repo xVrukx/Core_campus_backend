@@ -167,49 +167,83 @@ useEffect(() => {
                 </button>
 
                 {openCourse === course && (
-                  <div className="border-t border-[#2A2A2A] p-4 space-y-3">
-                    {files.map((file) => (
-                      <div
-                        key={file._id}
-                        className="
-                          bg-[#1E1E1E]
-                          rounded-xl
-                          p-4
-                          flex
-                          justify-between
-                          items-center
-                        "
-                      >
-                        <div>
-                          <p className="font-semibold">
-                            {file.studentName}
-                          </p>
-
-                          <p className="text-sm text-[#8E8E93]">
-                            {file.file.originalName}
-                          </p>
-                        </div>
-
-                        <a
-                          href={`https://core-campus-backend.onrender.com${file.file.url}`}
-                          target="_blank"
-                          rel="noreferrer"
+                    <div className="border-t border-[#2A2A2A] p-4 space-y-3">
+                      {files.map((file) => (
+                        <div
+                          key={file._id}
                           className="
-                            px-3
-                            py-2
+                            bg-[#1E1E1E]
                             rounded-xl
-                            bg-[#007AFF]
-                            text-white
-                            text-sm
+                            p-4
+                            border
+                            border-[#2A2A2A]
                           "
                         >
-                          Open
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className="font-semibold text-[#E0E0E0]">
+                                {file.studentName}
+                              </p>
+
+                              <p className="text-sm text-[#8E8E93] mt-1">
+                                {file.file.originalName}
+                              </p>
+
+                              <p className="text-xs text-[#8E8E93] mt-1">
+                                Subject: {file.subject}
+                              </p>
+
+                              <p className="text-xs text-[#8E8E93]">
+                                {new Date(file.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+
+                            <FileText className="h-6 w-6 text-[#007AFF]" />
+                          </div>
+
+                          <div className="flex gap-3 mt-4">
+                            <a
+                              href={`https://core-campus-backend.onrender.com${file.file.url}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="
+                                px-4
+                                py-2
+                                rounded-xl
+                                bg-[#007AFF]
+                                text-white
+                                text-sm
+                                font-semibold
+                                hover:opacity-90
+                                transition
+                              "
+                            >
+                              Open
+                            </a>
+
+                            <a
+                              href={`https://core-campus-backend.onrender.com${file.file.url}`}
+                              download={file.file.originalName}
+                              className="
+                                px-4
+                                py-2
+                                rounded-xl
+                                bg-[#28A745]
+                                text-white
+                                text-sm
+                                font-semibold
+                                hover:opacity-90
+                                transition
+                              "
+                            >
+                              Download
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                                </div>
             )
           )}
         </div>

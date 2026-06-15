@@ -118,7 +118,7 @@ useEffect(() => {
     const getFileUrl = (filePath) => {
       if (!filePath) return "#";
       if (filePath.startsWith("http")) return filePath;
-    return `http://localhost:5000${filePath}`;
+    return `https://core-campus-backend.onrender.com${filePath}`;
   };
 
   return (
