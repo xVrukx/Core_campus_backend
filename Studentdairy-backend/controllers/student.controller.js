@@ -426,7 +426,7 @@ export const getStudentTeachers = async (req, res) => {
   }
 };
 
-export const uploadStudentFile = async (req,res) => {
+export const uploadStudentFile = async (req, res) => {
   try {
     const {
       studentName,
@@ -434,18 +434,33 @@ export const uploadStudentFile = async (req,res) => {
       course,
       subject,
     } = req.body;
-    
+
+    if (!studentName) {
+      return res.status(400).json({
+        message: "Student name required",
+      });
+    }
+
+    if (!teachers) {
+      return res.status(400).json({
+        message: "Teachers required",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         message: "File required",
       });
     }
 
-    const teacher = JSON.parse(teachers);
+    const parsedTeachers =
+      typeof teachers === "string"
+        ? JSON.parse(teachers)
+        : teachers;
 
     const docs = [];
 
-    for (const teacherName of teacher) {
+    for (const teacherName of parsedTeachers) {
       const doc = await StudentSend.create({
         studentName,
         teacherName,
@@ -466,11 +481,14 @@ export const uploadStudentFile = async (req,res) => {
     }
 
     return res.status(201).json({
-      message: "File sent",
+      message: "File sent successfully",
       docs,
     });
   } catch (error) {
+    console.error("Student Upload Error:", error);
+
     return res.status(500).json({
+      message: "Server error while uploading file",
       error: error.message,
     });
   }
