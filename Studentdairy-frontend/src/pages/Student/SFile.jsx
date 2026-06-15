@@ -15,7 +15,7 @@ export const SFile = () => {
       if (!user?.name) return;
 
       const res = await fetch(
-        `http://localhost:5000/student/files/${encodeURIComponent(user.name)}`
+        `https://core-campus-backend.onrender.com/student/files/${encodeURIComponent(user.name)}`
       );
 
       if (!res.ok) {

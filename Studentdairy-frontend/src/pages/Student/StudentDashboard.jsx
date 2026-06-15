@@ -26,7 +26,7 @@ export const StudentDashboard = () => {
       if (!user?.name) return;
 
       const res = await fetch(
-        `http://localhost:5000/student/dashboard/${encodeURIComponent(user.name)}`,
+        `https://core-campus-backend.onrender.com/student/dashboard/${encodeURIComponent(user.name)}`,
         {
           method: "GET",
           headers: {

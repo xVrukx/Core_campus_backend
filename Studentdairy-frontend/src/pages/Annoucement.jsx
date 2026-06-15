@@ -18,7 +18,7 @@ export const AnnouncementPage = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/announcement");
+      const res = await fetch("https://core-campus-backend.onrender.com/announcement");
 
       if (!res.ok) {
         throw new Error("Failed to fetch announcements");
@@ -45,7 +45,7 @@ export const AnnouncementPage = () => {
     try {
       setPosting(true);
 
-      const res = await fetch("http://localhost:5000/announcement", {
+      const res = await fetch("https://core-campus-backend.onrender.com/announcement", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

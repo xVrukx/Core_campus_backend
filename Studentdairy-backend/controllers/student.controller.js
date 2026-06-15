@@ -355,3 +355,114 @@ export const getStudentFiles = async (req, res) => {
     });
   }
 };
+
+export const getStudentTeachers = async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    const student = await User.findOne({
+      name,
+      role: "student",
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found",
+      });
+    }
+
+    const studentObj = student.toObject();
+
+    const courseKey = Object.keys(studentObj).find(
+      (key) =>
+        ![
+          "_id",
+          "name",
+          "role",
+          "password",
+          "__v",
+          "createdAt",
+          "updatedAt",
+        ].includes(key)
+    );
+
+    const subjects = Object.keys(
+      studentObj[courseKey]
+    );
+
+    const teachers = await Teacher.find({
+      role: "teacher",
+    });
+
+    const matchedTeachers = teachers.filter(
+      (teacher) =>
+        subjects.includes(
+          teacher.Subject
+            .toLowerCase()
+            .replace(/\s+/g, "_")
+        )
+    );
+
+    return res.status(200).json({
+      course: courseKey,
+      teachers: matchedTeachers,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+export const uploadStudentFile = async (
+  req,
+  res
+) => {
+  try {
+    const {
+      studentName,
+      teacherNames,
+      course,
+      subject,
+    } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "File required",
+      });
+    }
+
+    const teachers = JSON.parse(teacherNames);
+
+    const docs = [];
+
+    for (const teacherName of teachers) {
+      const doc = await StudentSend.create({
+        studentName,
+        teacherName,
+        course,
+        subject,
+
+        file: {
+          originalName: req.file.originalname,
+          storedName: req.file.filename,
+          path: req.file.path,
+          url: `/uploads/${req.file.filename}`,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+        },
+      });
+
+      docs.push(doc);
+    }
+
+    return res.status(201).json({
+      message: "File sent",
+      docs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
+};

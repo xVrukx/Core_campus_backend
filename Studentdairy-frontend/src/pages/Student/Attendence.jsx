@@ -23,7 +23,7 @@ export const AttendancePage = () => {
       if (!user?.name) return;
 
       const res = await fetch(
-        `http://localhost:5000/student/attendance/${encodeURIComponent(user.name)}`
+        `https://core-campus-backend.onrender.com/student/attendance/${encodeURIComponent(user.name)}`
       );
 
       if (!res.ok) {
@@ -84,7 +84,7 @@ export const AttendancePage = () => {
       setOtpMessage("");
 
       // Change this endpoint later if your backend route differs
-      const res = await fetch("http://localhost:5000/student/attendance/submit-otp", {
+      const res = await fetch("https://core-campus-backend.onrender.com/student/attendance/submit-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

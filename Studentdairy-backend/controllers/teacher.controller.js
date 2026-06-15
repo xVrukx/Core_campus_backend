@@ -312,3 +312,47 @@ export const uploadTeacherFile = async (req, res) => {
     });
   }
 };
+
+export const getTeacherReceivedFiles =
+  async (req, res) => {
+    try {
+      const { name } = req.params;
+
+      const teacher =
+        await Teacher.findOne({
+          name,
+          role: "teacher",
+        });
+
+      if (!teacher) {
+        return res.status(404).json({
+          message: "Teacher not found",
+        });
+      }
+
+      const files = await StudentSend.find({
+        teacherName: name,
+      }).sort({
+        createdAt: -1,
+      });
+
+      const grouped = {};
+
+      files.forEach((file) => {
+        if (!grouped[file.course]) {
+          grouped[file.course] = [];
+        }
+
+        grouped[file.course].push(file);
+      });
+
+      return res.status(200).json({
+        subject: teacher.Subject,
+        courses: grouped,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: error.message,
+      });
+    }
+  };

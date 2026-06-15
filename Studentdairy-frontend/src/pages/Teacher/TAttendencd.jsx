@@ -18,7 +18,7 @@ export const TAttendence = () => {
       if (!user?.name) return;
 
       const res = await fetch(
-        `http://localhost:5000/teacher/attendance/${encodeURIComponent(
+        `https://core-campus-backend.onrender.com/teacher/attendance/${encodeURIComponent(
           user.name
         )}`
       );
@@ -46,7 +46,7 @@ export const TAttendence = () => {
       }));
 
       const res = await fetch(
-        "http://localhost:5000/teacher/attendance/generate-otp",
+        "https://core-campus-backend.onrender.com/teacher/attendance/generate-otp",
         {
           method: "POST",
           headers: {
